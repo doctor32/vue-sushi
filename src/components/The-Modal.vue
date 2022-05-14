@@ -1,12 +1,10 @@
 <template>
     <div ref="modalBody" class="fixed top-0	left-0 modal__body rou">
         <div class="modal bg-purple-800 rounded-xl">
-
             <div>
                 <p class="text-xl mt-2 text-white">Заказ принят!</p>
                 <p class="mt-4 text-gray-300">{{this.$store.state.buyersName}}, cпасибо за заказ. Мы скоро с Вами свяжемся.</p>
             </div>
-
             <button @click="closeModal" class="mb-3 rounded-xl px-5 bg-gray-300 hover:bg-white duration-500">Понятно</button>
         </div>
     </div>
@@ -39,10 +37,7 @@
     align-items: center;
     flex-direction: column;
     justify-content: space-between;
-    button {
-    
-    }
-    p{
+    p {
         text-align: center;
     }
 }

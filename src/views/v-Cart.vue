@@ -1,12 +1,12 @@
 <template>
     <div class="bg-gray-100 rounded-xl p-5 mt-12 flex flex-col gap-10">
-        <p class="text-center text-xl">{{CART_G.length > 0 ? 'Список товаров:' : 'Ваша корзина пока что пуста.'}}</p>
+        <p class="text-center text-xl">{{$store.state.cart.length > 0 ? 'Список товаров:' : 'Ваша корзина пока что пуста.'}}</p>
 
-        <div class="flex gap-5" v-if="CART_G.length">
+        <div class="flex gap-5" v-if="$store.state.cart.length">
 
             <div class="flex flex-col gap-5 flex-1">
             <vCartItem 
-            v-for="(item, index) in CART_G" :key="item.id"
+            v-for="(item, index) in $store.state.cart" :key="item.id"
             :item="item"
             @deleteFromCart="deleteFromCart(index)"
             />
@@ -48,7 +48,7 @@
 <script>
 import vCartItem from '@/components/v-Cart-Item'
 import theModal from '@/components/The-Modal.vue'
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters} from 'vuex'
 
 
 export default {
@@ -63,16 +63,14 @@ export default {
     },
     components: {vCartItem, theModal},
     computed: {
-        ...mapGetters(['CART_G', 'CART_TOTAL'])
+        ...mapGetters(['CART_TOTAL'])
     },
     methods: {
-        ...mapActions(['DELETE_FROM_CART', 'CLEAR_CART']),
         deleteFromCart(index) {
-
-            this.DELETE_FROM_CART(index)
+            this.$store.commit('DELETE_FROM_CART', index)
         },
         clearCart() {
-            this.CLEAR_CART()
+            this.$store.commit('CLEAR_CART')
         },
         makeOrder() {
             this.validate()

@@ -40,7 +40,7 @@
     
     <vPagination 
     @choosePage="choosePage"
-    :pagesCount="this.$store.getters.PAGE_COUNT"
+    :pagesCount="$store.state.pagesCount"
     />
 
 </div>
@@ -83,27 +83,27 @@ data() {
     },
     components: {vCatalogItem, vPagination},
     methods: {
-        ...mapActions(['ADD_TO_CART', 'CHOOSE_PAGE', 'FILTER_PRODUCTS', 'DISABLE_FILTERS', 'SORT']),
+        ...mapActions(['CHOOSE_PAGE', 'FILTER_PRODUCTS', 'DISABLE_FILTERS', 'SORT', 'GET_DATA']),
         addToCart(data) { 
-            this.ADD_TO_CART(data)
+            this.$store.commit('ADD_TO_CART', data)
         },
         choosePage(idx) {
-            this.CHOOSE_PAGE(idx)
+            this.$store.commit('CHOOSE_PAGE', idx)
         },
         filterItems(item, index) {
+            this.sort = ''
             this.categoryIndex = index
             this.$store.state.pageIndex = 0
-            if (item.att === 'all') {
-                this.DISABLE_FILTERS(item)
-            } else {
-                this.FILTER_PRODUCTS(item)
-            }
+            this.$store.commit('FILTER_PRODUCTS', item)
+            this.$store.commit('SET_PAGE_COUNT')
         },
         sortBy() {
             this.$store.state.pageIndex = 0
-            this.SORT(this.sort)
-        }
-    }
+            this.$store.commit('SORT', this.sort)
+        },
+        mounted() {
+        },
+    },
 }
 
 </script>

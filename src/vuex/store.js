@@ -1,22 +1,34 @@
 import {createStore} from 'vuex'
-import products from './modules/products.js'
+import axios from 'axios'
 
 export default createStore({
     state() {
         return {
-            products,
-            productsOnPage: products.slice(0, 8),
-            filterProducts: [...products],
+            products: null,
+            productsOnPage: null,
+            filterProducts: null,
             notesOnPage: 8,
-            pagesCount: Math.ceil(products.length / 8),
             cart: [],
             buyersName: '',
-            pageIndex: 0
+            pageIndex: 0,
+            pagesCount: 0,
         }
     },
     mutations: {
-        SET_TO_CART(state, product) {
-            if(state.cart.length) {
+        GET_DATA(state, data) {
+            state.products = data
+        },
+        SET_PRODUCTS_ON_PAGE(state) {
+            state.productsOnPage = state.products.slice(0, 8)
+        },
+        SET_PAGE_COUNT(state) {
+            state.pagesCount = Math.ceil(state.filterProducts.length / state.notesOnPage)
+        },
+        SET_FILTER_PRODUCTS(state) {
+            state.filterProducts = [...state.products]
+        },
+        ADD_TO_CART(state, product) {
+            if (state.cart.length) {
                 let isProductAdded = false
                 state.cart.forEach(element => {
                     if (element.id === product.id) {
@@ -24,112 +36,64 @@ export default createStore({
                         element.count++
                     }
                 });
-
-                if(!isProductAdded) {
-                    state.cart.push(product)
-                }
-
+                !isProductAdded ? state.cart.push(product) : false
+                
             } else {
                 state.cart.push(product)
             }
         },
-        DELETE_FROM_CART_M(state, index) {
+        DELETE_FROM_CART(state, index) {
             return state.cart.splice(index, 1)
         },
-        SET_INCREMENT(state, item) {
+        INCREMENT(state, item) {
             state.cart.find(product => product.id === item.id).count++
         },
-        SET_DECREMENT(state, item) {
+        DECREMENT(state, item) {
             state.cart.find(product => product.id === item.id).count--
             if (state.cart.find(product => product.id === item.id).count == 0) {
                 const index = state.cart.indexOf(item)
                 state.cart.splice(index, 1)
             }
         },
-        SET_CLEAR_CART(state) {
+        CLEAR_CART(state) {
             return state.cart = []
         },
-        SET_CHOOSE_PAGE(state, index) {
+        CHOOSE_PAGE(state, index) {
             let pageNumber = index + 1
             let start = (pageNumber - 1) * state.notesOnPage
             let end = start + state.notesOnPage
-            console.log(state.filterProducts);
-
             state.productsOnPage = state.filterProducts.slice(start, end)
         },
-        SET_FILTRED_PRODUCTS(state, item) {
+        FILTER_PRODUCTS(state, item) {
             state.filterProducts = []
-            state.filterProducts.push(...state.products.filter(product => product.type === item.att))
-
+                if (item.att === 'all') {
+                    state.filterProducts.push(...state.products)
+                } else {
+                    state.filterProducts.push(...state.products.filter(product => product.type === item.att))
+                }
             state.productsOnPage = state.filterProducts.slice(0, 8)
         },
-        SET_DISABLE_FILTERS(state) {
-            state.filterProducts = []
-            state.filterProducts.push(...state.products)
-            state.productsOnPage = state.filterProducts.slice(0, 8)
-        },
-        SET_SORT(state, methodOfSort) {
-            console.log(state, methodOfSort);
-            function sorByMaxPrice(arr) {
-                arr.sort((a, b) => a.price < b.price ? 1 : -1)
-            }
-            function sorByMinPrice(arr) {
-                arr.sort((a, b) => a.price >b.price ? 1 : -1)
-            }
-            function sorByMinWeight(arr) {
-                arr.sort((a, b) => a.weight > b.weight ? 1 : -1)
-            }
-            function sorByMaxWeight(arr) {
-                arr.sort((a, b) => a.weight < b.weight ? 1 : -1)
-            }
-            
-            methodOfSort === 'fromPriceMax' ? sorByMaxPrice(state.filterProducts) : ''
-            methodOfSort === 'fromPriceMin' ? sorByMinPrice(state.filterProducts) : ''
-            methodOfSort === 'fromWeightMin' ? sorByMinWeight(state.filterProducts) : ''
-            methodOfSort === 'fromWeightMax' ? sorByMaxWeight(state.filterProducts) : ''
-
+        SORT(state, methodOfSort) {            
+            methodOfSort === 'fromPriceMax' ? state.filterProducts.sort((a, b) => a.price < b.price ? 1 : -1) : ''
+            methodOfSort === 'fromPriceMin' ? state.filterProducts.sort((a, b) => a.price > b.price ? 1 : -1) : ''
+            methodOfSort === 'fromWeightMin' ? state.filterProducts.sort((a, b) => a.weight > b.weight ? 1 : -1) : ''
+            methodOfSort === 'fromWeightMax' ? state.filterProducts.sort((a, b) => a.weight < b.weight ? 1 : -1) : ''
 
             state.productsOnPage = state.filterProducts.slice(0, 8)
         }
     },
     actions: {
-        ADD_TO_CART( {commit}, product,) {
-            commit('SET_TO_CART', product)
-        },
-        DELETE_FROM_CART( {commit}, index) {
-            commit('DELETE_FROM_CART_M', index)
-        },
-        CLICK_INCREMENT({commit}, item) {
-            commit('SET_INCREMENT', item)
-        },
-        CLICK_DECREMENT({commit}, item) {
-            commit('SET_DECREMENT', item)
-        },
-        CLEAR_CART({commit}) {
-            commit('SET_CLEAR_CART')
-        },
-        CHOOSE_PAGE({commit}, index) {
-            commit('SET_CHOOSE_PAGE', index)
-        },
-        FILTER_PRODUCTS({commit}, item) {
-            commit("SET_FILTRED_PRODUCTS", item)
-        },
-        DISABLE_FILTERS({commit}) {
-            commit('SET_DISABLE_FILTERS')
-        },
-        SORT({commit}, methodOfSort) {
-            commit('SET_SORT', methodOfSort)
+        async GET_DATA({commit}) {
+            const {data} = await axios.get('https://vue-try-data-default-rtdb.europe-west1.firebasedatabase.app/products/-N1z7-le4Q5Cmv-3Ii99.json')
+            commit('GET_DATA', data)
+            commit('SET_PRODUCTS_ON_PAGE')
+            commit('SET_FILTER_PRODUCTS')
+            commit('SET_PAGE_COUNT')
         }
     },
     getters: {
-        CART_G(state) {
-            return state.cart
-        },
         CART_QUANTITY(state) {
             return state.cart.length
-        },
-        PRODUCTS(state) {
-            return state.products
         },
         CART_TOTAL(state) {
             let result = [0]
@@ -141,12 +105,6 @@ export default createStore({
             result = result.reduce((previousValue, currentValue) => previousValue + currentValue)
 
             return result
-        },
-        FILTRED_PRODUCTS(state) {
-            return state.filterProducts
-        },
-        PAGE_COUNT (state, getters) {
-            return Math.ceil(getters.FILTRED_PRODUCTS.length / state.notesOnPage)
         }
     }
 })

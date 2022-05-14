@@ -9,35 +9,37 @@
                 <span class="font-medium">Количество: </span> 
                 <div class="flex ">
                     <button class=" btn bg-slate-200 px-1 flex items-center content-center rounded-lg hover:bg-white mx-1 ml-3 duration-300 w-5"
-                    @click="increment"
-                    >+</button>  
+                        @click="increment"
+                        >+
+                    </button>  
                     {{item.count}} 
                     <button class="btn bg-slate-200 px-1 flex items-center content-center rounded-lg hover:bg-white mx-1 duration-300 w-5"
-                    @click="decrement"
-                    >-</button>
+                        @click="decrement"
+                        >-
+                    </button>
                 </div>
             </div>
-
         </div>
-        <button @click="deleteProduct" class="bg-red-500 text-white self-center px-6 py-2 rounded-xl hover:bg-red-600 duration-300" style="margin: 0 30px 0 auto">Удалить</button>
+        <button @click="deleteProduct" 
+            class="bg-red-500 text-white self-center px-6 py-2 rounded-xl hover:bg-red-600 duration-300" 
+            style="margin: 0 30px 0 auto">
+            Удалить
+        </button>
     </div>
 </template>
 
 <script>
-import{ mapActions } from 'vuex'
-
     export default {
         props: ['item'],
         methods: { 
-            ...mapActions(['CLICK_INCREMENT', 'CLICK_DECREMENT']),
             deleteProduct() {
                 this.$emit('deleteFromCart', this.item)
             },
             increment() {
-                this.CLICK_INCREMENT(this.item)
+                this.$store.commit('INCREMENT', this.item)
             },
             decrement() {
-                this.CLICK_DECREMENT(this.item)
+                this.$store.commit('DECREMENT', this.item)
             }
         }
     }

@@ -5,13 +5,16 @@
         <p>Вес: {{item.weight}} г</p>
         <p>Цена: {{item.price}}₴</p>
         <button class="bg-purple-500 hover:bg-purple-700 duration-500 text-white p-2 rounded-xl mt-4 :hover mb-3"
-        @click="addToCart"
-        >Добавить в корзину</button>
+            @click="addToCart"
+            >Добавить в корзину
+        </button>
 
         <router-link :to="{ name: 'item', params: { id: item.id } }">        
-            <button class="bg-gray-400 hover:bg-gray-700 duration-500 text-white py-2 px-10 rounded-xl :hover mb-5"
-            @click="aboutRoll"
-            >Подробнее</button>
+            <button 
+                class="bg-gray-400 hover:bg-gray-700 duration-500 text-white py-2 px-10 rounded-xl :hover mb-5"
+                @click="aboutRoll"
+                >Подробнее
+            </button>
         </router-link>
 
     </div>
@@ -31,7 +34,7 @@ props: ['item'],
             return { 
                 ...this.item,
                 count: 1 
-                }
+            }
         }
     },
     methods: {

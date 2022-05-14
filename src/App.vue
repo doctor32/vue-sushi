@@ -14,7 +14,10 @@
 import TheHeader from '@/components/The-Header.vue'
 
 export default {
-  components: {TheHeader}
+  components: {TheHeader},
+      mounted() {
+        this.$store.dispatch('GET_DATA')
+    }
 }
 </script>
 
